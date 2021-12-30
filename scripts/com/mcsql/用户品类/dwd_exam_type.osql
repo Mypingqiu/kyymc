@@ -1,0 +1,223 @@
+--name:dwd_exam_type
+--author:xiaoya
+--create time:2021-12-30 11:33
+--todo 运营所需聚合品类数据
+--todo 相关数据整理   https://docs.qq.com/sheet/DVHNBUVladW5SQXRp?tab=BB08J2
+--【思维导图】 用户品类 https://kdocs.cn/l/sttrpmvxtVjA
+DROP TABLE IF EXISTS kyy_dwd_exam_type;
+
+CREATE TABLE IF NOT EXISTS kyy_dwd_exam_type
+(
+  user_id             BIGINT COMMENT '用户ID',
+  industry_exam_id_01 BIGINT COMMENT '考试类型ID',
+  industry_exam_id_02 BIGINT COMMENT '考试类型ID',
+  industry_exam_id_03 BIGINT COMMENT '考试类型ID',
+  industry_exam_id_04 BIGINT COMMENT '考试类型ID',
+  industry_exam_id_05 BIGINT COMMENT '考试类型ID',
+  industry_exam_id_06 BIGINT COMMENT '考试类型ID',
+  industry_exam_id_07 BIGINT COMMENT '考试类型ID',
+  industry_exam_id_08 BIGINT COMMENT '考试类型ID',
+  industry_exam_id_09 BIGINT COMMENT '考试类型ID'
+)
+COMMENT '用户品类明细';
+
+INSERT OVERWRITE TABLE kyy_dwd_exam_type
+  SELECT ks.uid user_id,
+         CASE
+         WHEN iet01.exam_type_id IS NOT NULL THEN iet01.exam_type_id
+         ELSE 0
+         END industry_exam_id_01,
+         ks.current_exam_type industry_exam_id_02,
+         CASE
+         WHEN iet03.exam_type_id IS NOT NULL THEN iet03.exam_type_id
+         ELSE 0
+         END industry_exam_id_03,
+         CASE
+         WHEN iet04.exam_type_id IS NOT NULL THEN iet04.exam_type_id
+         ELSE 0
+         END industry_exam_id_04,
+         CASE
+         WHEN iet05.exam_type_id IS NOT NULL THEN iet05.exam_type_id
+         ELSE 0
+         END industry_exam_id_05,
+         CASE
+         WHEN iet06.industry_exam_type IS NOT NULL THEN iet06.industry_exam_type
+         ELSE 0
+         END industry_exam_id_06,
+         CASE
+         WHEN iet07.exam_type_id IS NOT NULL THEN iet07.exam_type_id
+         ELSE 0
+         END industry_exam_id_07,
+         CASE
+         WHEN iet08.exam_type_id IS NOT NULL THEN iet08.exam_type_id
+         ELSE 0
+         END industry_exam_id_08,
+         CASE
+         WHEN iet9.exam_id IS NOT NULL THEN iet9.exam_id
+         ELSE 0
+         END industry_exam_id_9
+  FROM khome_space_mi ks
+  --    学习计划 - 学员计划考试类型（包含学员填写和老师填写）
+    LEFT JOIN (
+      SELECT epes.user_id,
+             epes.exam_type_id
+      FROM (
+        SELECT epes.user_id,
+               s.exam_type_id,
+               epes.id,
+               row_number()OVER (PARTITION BY epes.user_id ORDER BY epes.id DESC) AS rk
+        FROM edu_preparation_exam_subject_mi epes
+          JOIN subjects_mi s
+            ON epes.subject_id = s.id
+        WHERE epes.display = 1
+      ) epes
+      WHERE epes.rk = 1
+    ) iet01
+      ON ks.uid = iet01.user_id
+  --  填写表单行为 - 用户填写品类
+    LEFT JOIN (
+      SELECT epes.user_id,
+             epes.exam_type_id
+      FROM (
+        SELECT afd.commit_user user_id,
+               CASE
+               WHEN afd.exam_type LIKE "%初级会计%" THEN 2
+               WHEN afd.exam_type LIKE "%中级会计%" THEN 3
+               WHEN afd.exam_type LIKE "%注册会计%" THEN 4
+               WHEN afd.exam_type LIKE "%管理会计%" THEN 5
+               WHEN afd.exam_type LIKE "%税务师%" THEN 6
+               WHEN afd.exam_type LIKE "%实操VIP会员%" THEN 7
+               WHEN afd.exam_type LIKE "%管理会计师（中级）%" THEN 65
+               WHEN afd.exam_type LIKE "%美国注册管理会计师(CMA)" THEN 66
+               ELSE 0
+               END exam_type_id,
+               row_number()OVER (PARTITION BY afd.commit_user ORDER BY afd.id DESC) AS rk
+        FROM ask_form_data_mi afd
+        WHERE afd.commit_user != 0
+      ) epes
+      WHERE epes.rk = 1
+    ) iet03
+      ON ks.uid = iet03.user_id
+  --  成交订单行为 - 购买商品的品类
+    LEFT JOIN (
+      SELECT oop.user_id,
+             oop.exam_type_id
+      FROM (
+        SELECT oo.user_id,
+               op.category_id exam_type_id,
+               row_number()OVER (PARTITION BY oo.user_id ORDER BY oo.id DESC) AS rk
+        FROM orders_order_mi oo
+          JOIN orders_order_goods_mi oog
+            ON oo.id = oog.order_id
+          JOIN orders_goods_mi og
+            ON oog.goods_id = og.id
+          JOIN orders_product_mi op
+            ON og.product_id = op.id
+        WHERE oo.create_type not in (4, 8, 9)
+        AND op.category_id != 0
+      ) oop
+      WHERE oop.rk = 1
+    ) iet04
+      ON ks.uid = iet04.user_id
+  --  活动领取行为（交易订单类型：活动领取、积分领取） - 领取商品的品类
+    LEFT JOIN (
+      SELECT oop.user_id,
+             oop.exam_type_id
+      FROM (
+        SELECT oo.user_id,
+               op.category_id exam_type_id,
+               row_number()OVER (PARTITION BY oo.user_id ORDER BY oo.id DESC) AS rk
+        FROM orders_order_mi oo
+          JOIN orders_order_goods_mi oog
+            ON oo.id = oog.order_id
+          JOIN orders_goods_mi og
+            ON oog.goods_id = og.id
+          JOIN orders_product_mi op
+            ON og.product_id = op.id
+        WHERE oo.create_type in (4, 8, 9)
+        AND op.category_id != 0
+      ) oop
+      WHERE oop.rk = 1
+    ) iet05
+      ON ks.uid = iet05.user_id
+  --  学习行为 - 看直播、看录播
+    LEFT JOIN (
+      SELECT ec.user_id,
+             ec.industry_exam_type
+      FROM (
+        SELECT emwt.user_id,
+               iet.id industry_exam_type,
+               row_number()OVER (PARTITION BY emwt.user_id ORDER BY emwt.created_at DESC) AS rk
+        FROM edu_media_watch_time_mi emwt
+          JOIN edu_course_lessoninfo_mi ecl
+            ON emwt.media_id = ecl.mediaid
+          JOIN edu_course_lesson_mi ecl2
+            ON ecl.lessonid = ecl2.id
+          JOIN edu_course_mi ec
+            ON ecl2.courseid = ec.id
+          JOIN subjects_mi s
+            ON ec.subject_id = s.id
+          JOIN industry_exam_type_mi iet
+            ON s.exam_type_id = iet.id
+        WHERE ec.categoryid != 0
+        AND iet.industry_id = 1
+      ) ec
+      WHERE ec.rk = 1
+    ) iet06
+      ON ks.uid = iet06.user_id
+  --做题
+    LEFT JOIN (
+      SELECT ooe.user_id,
+             ooe.exam_type_id
+      FROM (
+        SELECT mr.user_id,
+               s.exam_type_id,
+               row_number()OVER (PARTITION BY mr.user_id ORDER BY mr.id DESC) AS rk
+        FROM mock_record_mi mr
+          JOIN exam_mock_mi em
+            ON mr.mock_id = em.id
+          JOIN subjects_conversion_mi sc
+            ON em.subject_id = sc.exam_subject_id
+          JOIN subjects_mi s
+            ON sc.distribute_subject_id = s.id
+      ) ooe
+      WHERE ooe.rk = 1
+    ) iet07
+      ON ks.uid = iet07.user_id
+  --  各类直播课学习资源
+    LEFT JOIN (
+      SELECT xw.user_id,
+             xw.exam_type_id
+      FROM (
+        SELECT xws.user_id,
+               s.exam_type_id,
+               row_number()OVER (PARTITION BY xws.user_id ORDER BY xws.created_at DESC) AS rk
+        FROM xueyoo_webcast_subscribe_mi xws
+          JOIN xueyoo_webcast_mi xw
+            ON xws.webcast_id = xw.id
+          JOIN subjects s
+            ON xw.subject_id = s.id
+      ) xw
+      WHERE xw.rk = 1
+    ) iet08
+      ON ks.uid = iet08.user_id
+  --  1.下载中心资料下载
+  --2.小程序资料下载
+  --3.后续任何进行资料库中资料的下载的
+    LEFT JOIN (
+      SELECT fd.user_id,
+             fd.exam_id
+      FROM (
+        SELECT fdr.user_id,
+               fd.exam_id,
+               row_number()OVER (PARTITION BY fdr.user_id ORDER BY fdr.created_at DESC) AS rk
+        FROM file_download_record_mi fdr
+          JOIN file_dc_file_mi fdf
+            ON fdr.file_id = fdf.id
+          JOIN file_database_mi fd
+            ON fdf.file_id = fd.id
+      ) fd
+      WHERE fd.rk = 1
+    ) iet9
+      ON ks.uid = iet9.user_id;
+

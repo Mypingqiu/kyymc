@@ -1,0 +1,4 @@
+--name:查看分发品类
+--author:xiaoya
+--create time:2021-12-30 14:32
+select * from subjects s;
