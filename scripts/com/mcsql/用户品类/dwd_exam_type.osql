@@ -5,7 +5,6 @@
 --todo 相关数据整理   https://docs.qq.com/sheet/DVHNBUVladW5SQXRp?tab=BB08J2
 --【思维导图】 用户品类 https://kdocs.cn/l/sttrpmvxtVjA
 DROP TABLE IF EXISTS kyy_dwd_exam_type;
-
 CREATE TABLE IF NOT EXISTS kyy_dwd_exam_type
 (
   user_id             BIGINT COMMENT '用户ID',
