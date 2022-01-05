@@ -1,0 +1,10 @@
+--name:排查直播数据
+--author:xiaoya
+--create time:2022-01-04 11:33
+
+--数据没问题
+select *
+from xueyoo_webcast_visitor xwv
+where to_char(xwv.join_time, 'yyyymmdd') = '20220103';
+
+
