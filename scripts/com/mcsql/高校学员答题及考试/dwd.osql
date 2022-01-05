@@ -1,3 +1,31 @@
 --name:dwd
 --author:xiaoya
 --create time:2022-01-05 11:48
+--高校学员答题及考试
+DROP TABLE IF EXISTS kyy_dwd_universities_system;
+
+CREATE TABLE IF NOT EXISTS kyy_dwd_universities_system
+(
+  student_id             BIGINT COMMENT '序号',
+  universities_name      STRING COMMENT '学校名称',
+  student_name           STRING COMMENT '姓名',
+  sex                    STRING COMMENT '性别',
+  professional           STRING COMMENT '专业',
+  class_name             STRING COMMENT '班级',
+  mobile                 STRING COMMENT '联系电话'
+)
+COMMENT '考呀呀高校信息化平台登记表';
+
+
+select kdus.student_id,
+       ks.uid user_id,
+       kdus.universities_name,
+       kdus.student_name,
+       kdus.sex,
+       kdus.professional,
+       kdus.class_name,
+       kdus.mobile
+from kyy_dwd_universities_system kdus
+  LEFT JOIN khome_space ks
+    on kdus.mobile = ks.mobile;
+
