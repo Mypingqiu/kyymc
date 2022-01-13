@@ -1,0 +1,63 @@
+--name:商机数据导出
+--author:xiaoya
+--create time:2022-01-10 12:00
+--set
+--odps.idata.system.id = quickbi_query;
+--set
+--odps.sql.submit.mode = script;
+--set
+--odps.task.sql.realtime = all;
+--set
+--odps.sql.type.system.odps2 = true;
+create table kyy_dwd_test_business as
+  SELECT ATL_T_1_.`business_order_number` AS T_A0_5_,
+         ATL_T_1_.`department_name` AS T_A1_6_,
+         ATL_T_1_.`allocate_name` AS T_A2_7_,
+         ATL_T_1_.`follow_name` AS T_A3_8_,
+         ATL_T_1_.`exam_name` AS T_A4_9_,
+         ATL_T_1_.`user_id` AS T_A5_10_,
+         ATL_T_1_.`mobile` AS T_A6_11_,
+         ATL_T_1_.`business_status_str` AS T_A7_12_,
+         ATL_T_1_.`source_str` AS T_A8_13_,
+         TO_CHAR(ATL_T_1_.`time`, 'yyyyMMdd') AS T_A9_14_,
+         TO_CHAR(ARE_T_2_.`last_logined_at`, 'yyyyMMdd') AS T_A01_15_,
+         TO_CHAR(ARE_T_2_.`last_visitd_at`, 'yyyyMMdd') AS T_A11_16_,
+         TO_CHAR(ARE_T_2_.`last_paid_at`, 'yyyyMMdd') AS T_A21_17_,
+         ARE_T_2_.`buy_amount` AS T_A31_18_,
+         ARE_T_2_.`buy_num` AS T_A41_19_,
+         AEP_T_3_.`industry_exam_name` AS T_A51_20_,
+         ASS_T_4_.`province` AS T_A61_21_,
+         ASS_T_4_.`city` AS T_A71_22_,
+         ASS_T_4_.`flag` AS T_A81_23_,
+         ASS_T_4_.`type` AS T_A91_24_
+  FROM `kyy_test`.`kyy_adm_business_user_result` ATL_T_1_
+    LEFT JOIN `kyy_test`.`kaoyaya_adm_orders_user` ARE_T_2_
+      ON ATL_T_1_.`user_id` = ARE_T_2_.`id`
+    LEFT JOIN `kyy_test`.`kyy_dws_exam_type` AEP_T_3_
+      ON ATL_T_1_.`user_id` = AEP_T_3_.`user_id`
+    LEFT JOIN `kyy_test`.`kyy_dwd_user_address` ASS_T_4_
+      ON ATL_T_1_.`user_id` = ASS_T_4_.`uid`
+  WHERE ATL_T_1_.`business_status_str` IN ('待分配')
+  AND ATL_T_1_.`source_str` IN ('商品购买')
+  AND ATL_T_1_.`department_name` IN ('未分配部门')
+  AND ATL_T_1_.`exam_name` IN ('初级会计职称', '中级会计职称', '注册会计师')
+  GROUP BY ATL_T_1_.`business_order_number`,
+  ATL_T_1_.`department_name`,
+  ATL_T_1_.`allocate_name`,
+  ATL_T_1_.`follow_name`,
+  ATL_T_1_.`exam_name`,
+  ATL_T_1_.`user_id`,
+  ATL_T_1_.`mobile`,
+  ATL_T_1_.`business_status_str`,
+  ATL_T_1_.`source_str`,
+  TO_CHAR(ATL_T_1_.`time`, 'yyyyMMdd'),
+  TO_CHAR(ARE_T_2_.`last_logined_at`, 'yyyyMMdd'),
+  TO_CHAR(ARE_T_2_.`last_visitd_at`, 'yyyyMMdd'),
+  TO_CHAR(ARE_T_2_.`last_paid_at`, 'yyyyMMdd'),
+  ARE_T_2_.`buy_amount`,
+  ARE_T_2_.`buy_num`,
+  AEP_T_3_.`industry_exam_name`,
+  ASS_T_4_.`province`,
+  ASS_T_4_.`city`,
+  ASS_T_4_.`flag`,
+  ASS_T_4_.`type`;

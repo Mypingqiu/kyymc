@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS kyy_dwd_exam_type
   industry_exam_id_06 BIGINT COMMENT '考试类型ID',
   industry_exam_id_07 BIGINT COMMENT '考试类型ID',
   industry_exam_id_08 BIGINT COMMENT '考试类型ID',
-  industry_exam_id_09 BIGINT COMMENT '考试类型ID'
+  industry_exam_id_09 BIGINT COMMENT '考试类型ID',
+  industry_exam_id_10 BIGINT COMMENT '考试类型ID'
 )
 COMMENT '用户品类明细';
 
@@ -54,7 +55,11 @@ INSERT OVERWRITE TABLE kyy_dwd_exam_type
          CASE
          WHEN iet9.exam_id IS NOT NULL THEN iet9.exam_id
          ELSE 0
-         END industry_exam_id_9
+         END industry_exam_id_9,
+         CASE
+         WHEN iet10.exam_id IS NOT NULL THEN iet10.exam_id
+         ELSE 0
+         END industry_exam_id_10
   FROM khome_space_mi ks
   --    学习计划 - 学员计划考试类型（包含学员填写和老师填写）
     LEFT JOIN (
@@ -218,5 +223,14 @@ INSERT OVERWRITE TABLE kyy_dwd_exam_type
       ) fd
       WHERE fd.rk = 1
     ) iet9
-      ON ks.uid = iet9.user_id;
+      ON ks.uid = iet9.user_id
+--    证件照小程序 - 使用生成证件照行为
+    LEFT JOIN id_photo_record iet10 on ks.uid=iet10.user_id;
+
+
+
+
+select * from id_photo_record ipr;
+
+
 

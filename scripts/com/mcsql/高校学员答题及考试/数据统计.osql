@@ -1,0 +1,64 @@
+--name:数据统计
+--author:xiaoya
+--create time:2022-01-08 14:38
+--SET odps.sql.allow.fullscan = true;
+
+
+select kdus.universities_name,
+       kdus.student_name,
+       kdus.sex,
+       kdus.professional,
+       kdus.class_name class,
+       kdus.mobile,
+       ks.uid user_id,
+       kdccs.class_id,
+       kdccs.class_name,
+       kdccs.course_id,
+       kdccs.course_name,
+       kdccs.subject_id,
+       kdccs.chapter_id,
+       kdccs.chapter_name,
+       kdccs.section_id,
+       kdccs.section_name,
+       kdccs.question_id
+--       qr.question_id question_number,
+--       CASE
+--       WHEN qr.is_correct = 1 THEN qr.question_id
+--       ELSE NULL
+--       END question_true
+from kyy_dwd_universities_system kdus
+  LEFT JOIN khome_space ks
+    on kdus.mobile = ks.mobile
+  LEFT JOIN edu_classroom_member ecm
+    on ks.uid = ecm.userid
+  LEFT JOIN kyy_dwd_class_connect_section kdccs
+    on ecm.classroomid = kdccs.class_id;
+--  LEFT JOIN question_records qr
+--    on kdccs.question_id = qr.question_id
+--where qr.dt <= to_char(getdate(), 'yyyymmdd');
+
+
+
+SELECT
+count(1)
+FROM
+kyy_dws_universities_question_system kduqs;
+
+--select * from kyy_dwd_class_connect_section kdccs where kdccs.class_id=303;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

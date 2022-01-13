@@ -1,0 +1,51 @@
+--name:dwd_referer_event
+--author:xiaoya
+--create time:2022-01-07 09:37
+
+
+select id,
+       platform_id,
+       event_type,
+       user_id,
+       distinct_id,
+       event_date,
+       event_time,
+       client_type,
+       manufacturer,
+       model,
+       os,
+       os_version,
+       browser,
+       browser_version,
+       network_type,
+       referer,
+       referer_host,
+       url,
+       url_path,
+       title,
+       resolution,
+       screen_color_dept,
+       view_height,
+       su_cookie,
+       su_java,
+       lang_type,
+       redirect_count,
+       nav_type,
+       battery_level,
+       view_time,
+       open_time,
+       close_time,
+       ip,
+       country,
+       region,
+       city,
+       area,
+       isp,
+       action_type,
+       is_login
+from user_events ue;
+
+
+
+
+

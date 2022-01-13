@@ -1,0 +1,94 @@
+--name:create
+--author:xiaoya
+--create time:2022-01-08 17:13
+DROP TABLE IF EXISTS kyy_dws_universities_question_system;
+
+CREATE TABLE IF NOT EXISTS kyy_dws_universities_question_system
+(
+  universities_name          STRING COMMENT '学校名称',
+  student_name               STRING COMMENT '姓名',
+  sex                        STRING COMMENT '性别',
+  professional               STRING COMMENT '专业',
+  class                      STRING COMMENT '班级',
+  mobile                     STRING COMMENT '联系电话',
+  user_id                    BIGINT COMMENT '用户ID',
+  class_id                   BIGINT COMMENT '班级ID',
+  class_name                 STRING COMMENT '班级名称',
+  course_id                  BIGINT COMMENT '课程ID',
+  course_name                STRING COMMENT '课程名称',
+  subject_id                 BIGINT COMMENT '题库品类ID',
+  chapter_id                 BIGINT COMMENT '章ID',
+  chapter_name               STRING COMMENT '章名称',
+  section_id                 BIGINT COMMENT '节ID',
+  section_name               STRING COMMENT '节名称',
+  question_id                BIGINT COMMENT '题目ID',
+  question_number            BIGINT COMMENT '做题数量',
+  question_true              BIGINT COMMENT '正确数量'
+)
+COMMENT '考呀呀高校信息化平台登记表';
+
+INSERT OVERWRITE TABLE kyy_dws_universities_question_system
+  select kdus.universities_name,
+         kdus.student_name,
+         kdus.sex,
+         kdus.professional,
+         kdus.class_name class,
+         kdus.mobile,
+         ks.uid user_id,
+         kdccs.class_id,
+         kdccs.class_name,
+         kdccs.course_id,
+         kdccs.course_name,
+         kdccs.subject_id,
+         kdccs.chapter_id,
+         kdccs.chapter_name,
+         kdccs.section_id,
+         kdccs.section_name,
+         kdccs.question_id,
+         qr.question_id question_number,
+         CASE
+         WHEN qr.is_correct = 1 THEN qr.question_id
+         ELSE NULL
+         END question_true
+  from kyy_dwd_universities_system kdus
+    LEFT JOIN khome_space ks
+      on kdus.mobile = ks.mobile
+    LEFT JOIN edu_classroom_member ecm
+      on ks.uid = ecm.userid
+    LEFT JOIN kyy_dwd_class_connect_section kdccs
+      on ecm.classroomid = kdccs.class_id
+    LEFT JOIN question_records qr
+      on kdccs.question_id = qr.question_id
+    and ecm.userid = qr.user_id
+    and qr.dt <= to_char(getdate(), 'yyyymmdd')
+  ;
+--
+--select * from edu_classroom_member ecm LEFT JOIN kyy_dwd_class_connect_section kdccs
+--  on ecm.classroomid = kdccs.class_id
+--  LEFT JOIN question_records qr
+--    on kdccs.question_id = qr.question_id
+--  and ecm.userid = qr.user_id
+-- where qr.user_id in (3825645
+-- ,3777608
+-- ,3825662
+-- ,3825690
+-- ,3825841
+-- ,3826209
+-- ,3826036
+-- ,3825640
+-- ,3825972
+-- ,3825691
+-- ,3825643
+-- ,3826366
+-- ,3825920
+-- ,3825656
+-- ,3830321
+-- ,3825641
+-- ,3826062
+-- ,3825639
+-- ,3825664
+-- ,3825671
+-- ,3826211
+-- ,3826213) and qr.dt <= to_char(getdate(), 'yyyymmdd') ;
+
+

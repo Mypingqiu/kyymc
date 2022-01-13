@@ -1,6 +1,18 @@
 --name:查看分发品类
 --author:xiaoya
 --create time:2021-12-30 14:32
-select * from subjects s;
+select *
+from subjects s;
 --测试修改
 --合并最终代码
+
+
+select *
+from orders_bill ob
+where to_char(ob.created_at, 'yyyymmdd') = '20220106';
+
+
+select * from id_photo_record ipr;
+
+
+
