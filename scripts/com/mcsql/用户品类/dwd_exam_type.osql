@@ -227,7 +227,7 @@ INSERT OVERWRITE TABLE kyy_dwd_exam_type
 --    证件照小程序 - 使用生成证件照行为
     LEFT JOIN id_photo_record iet10 on ks.uid=iet10.user_id;
 
-
+--测试 更换邮箱
 
 
 select * from id_photo_record ipr;
