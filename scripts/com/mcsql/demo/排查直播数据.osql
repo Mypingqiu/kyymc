@@ -8,3 +8,48 @@ from xueyoo_webcast_visitor xwv
 where to_char(xwv.join_time, 'yyyymmdd') = '20220103';
 
 
+SELECT
+bs.shop_name,
+ot.id,
+CAST(ot.real_pay AS DOUBLE) real_pay,
+CASE
+WHEN ot.order_from = 1 THEN '营业额（门店）'
+WHEN ot.order_from = 2 THEN '营业额（线上）'
+WHEN ot.order_from = 3 THEN '营业额（团购）'
+ELSE '其他'
+END order_from,
+'开单' order_type,
+ot.created_at create_time,
+b.business_name
+FROM
+order_table ot
+  LEFT JOIN business_shop bs on ot.shop_id = bs.id
+  LEFT JOIN business b on bs.business_id = b.id
+where
+ot.pay_status = 2 and bs.shop_name='纸条自习室';
+
+
+SELECT
+bs.shop_name,
+ore.id,
+CAST(ore.real_price AS DOUBLE),
+CASE
+WHEN ore.order_from = 1 THEN '营业额（门店）'
+WHEN ore.order_from = 2 THEN '营业额（线上）'
+WHEN ore.order_from = 3 THEN '营业额（团购）'
+ELSE '其他'
+END order_from,
+'充值购卡' order_type,
+ore.created_at,
+b.business_name
+FROM
+order_recharge ore
+  LEFT JOIN business_shop bs on ore.shop_id = bs.id
+  LEFT JOIN business b on bs.business_id = b.id where bs.shop_name='纸条自习室' and ore.pay_status=2 and ore.is_free=2
+;
+
+--where   ore.is_free = 2 and ore.pay_status and bs.shop_name='纸条自习室';
+
+
+select ot.* from  order_table ot
+  LEFT JOIN business_shop bs on ot.shop_id = bs.id where bs.shop_name='纸条自习室' and ot.pay_status=2 and ot.order_status=3;

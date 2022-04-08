@@ -1,0 +1,93 @@
+--name:题库数据
+--author:xiaoya
+--create time:2022-03-08 18:28
+INSERT INTO TABLE kyy_adm_user_visit_link PARTITION(dt)
+SELECT qdr.user_id,
+       to_date(TO_CHAR(qdr.create_at, 'yyyyMMdd'), 'yyyyMMdd') time,
+       '' os，
+       '每日一练习题' action,
+       concat(
+         '练习'
+       , COUNT(DISTINCT a.question_id)
+       , '道题'
+       , '\n发生于'
+       , d.name
+       , '|'
+       , c.name
+       , '|每日一练习题'
+       ) result,
+       '做题' action_type,
+       COUNT(DISTINCT a.question_id) COUNT,
+       TO_CHAR(qdr.create_at, 'yyyyMMdd') DATE,
+       COUNT(1) num,
+       d.name exam_type_name,
+       TO_CHAR(qdr.create_at, 'yyyyMMdd') dt
+FROM question_day_record qdr
+  JOIN question_day a
+    on qdr.question_day_id = a.id
+  JOIN question_subject_category b
+    ON a.question_id = b.question_id
+  JOIN subject c
+    ON b.subject_id = c.id
+  JOIN subject d
+    ON c.parent_id = d.id
+  JOIN subject e
+    ON d.parent_id = e.id
+WHERE e.id = 2771
+AND d.display = 1
+AND d.oem = 'www'
+AND TO_CHAR(qdr.create_at, 'yyyyMMdd') <= '${datetime}'
+GROUP BY qdr.user_id
+, d.name
+, c.name
+, TO_CHAR(qdr.create_at, 'yyyyMMdd');
+
+--
+INSERT INTO TABLE kyy_adm_user_visit_link PARTITION(dt)
+  SELECT a.user_id
+  ,
+         to_date(dt, 'yyyyMMdd') time
+  ,
+         '' os
+  ,
+         '练习题' action
+  ,
+         concat(
+           '练习'
+         , COUNT(DISTINCT a.question_id)
+         , '道题'
+         , '\n发生于'
+         , d.name
+         , '|'
+         , c.name
+         , '|练习题'
+         ) result
+  ,
+         '做题' action_type
+  ,
+         COUNT(DISTINCT a.question_id) COUNT
+  ,
+         a.dt DATE
+  ,
+         COUNT(1) num
+  ,
+         d.name exam_type_name
+  ,
+         a.dt
+  FROM question_records a
+    JOIN question_subject_category b
+      ON a.question_id = b.question_id
+    JOIN subject c
+      ON b.subject_id = c.id
+    JOIN subject d
+      ON c.parent_id = d.id
+    JOIN subject e
+      ON d.parent_id = e.id
+  WHERE e.id = 2771
+  AND d.display = 1
+  AND d.oem = 'www'
+  AND a.dt = '${datetime}'
+  GROUP BY a.user_id
+  , d.name
+  , c.name
+  , a.dt;

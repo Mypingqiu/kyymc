@@ -61,6 +61,38 @@ INSERT OVERWRITE TABLE kyy_dws_universities_question_system
       on kdccs.question_id = qr.question_id
     and ecm.userid = qr.user_id
     and qr.dt <= to_char(getdate(), 'yyyymmdd')
+    LEFT JOIN (
+      select
+      kdscw.industry_type_name,
+      kdscw.subjects_name,
+      kdscw.webcast_name,
+      kdscw.visitor_type,
+      kdscw.user_id,
+      kdscw.webcast_time,
+      kdscw.diff_time
+      from
+      (
+        select
+        kdxw.industry_type_name,
+        kdxw.subjects_name,
+        kdxw.webcast_name,
+        kdxw.visitor_type,
+        kdxw.user_id,
+        kdxw.webcast_time,
+        kdxw.diff_time,
+        row_number() over (
+        partition by kdxw.industry_type_name,
+        kdxw.user_id
+        order by
+        kdxw.webcast_time desc
+        ) row_number
+        from
+        kyy_dws_xueyoo_webcast kdxw
+    ) kdscw
+  where
+  kdscw.row_number = 1
+  ) kdscw on ks.uid = kdscw.user_id
+  and a.industry_type_name = kdscw.industry_type_name
   ;
 --
 --select * from edu_classroom_member ecm LEFT JOIN kyy_dwd_class_connect_section kdccs

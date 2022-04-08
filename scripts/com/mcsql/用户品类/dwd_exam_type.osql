@@ -236,10 +236,12 @@ INSERT OVERWRITE TABLE kyy_dwd_exam_type
       FROM (
         select wu.user_id,
                dp.exam_id,
-               row_number()OVER (PARTITION BY wu.user_id ORDER BY wu.created_at DESC) AS rk
+               row_number()OVER (PARTITION BY wu.user_id ORDER BY wu.created_at,ut.created_at DESC) AS rk
         from wx_user wu
+          JOIN user_task ut
+            on wu.user_id = ut.user_id
           JOIN data_package dp
-            on wu.wx_app = dp.wx_app
+            on ut.data_package_id =dp.id
         where wu.user_id > 0
       ) wu
       WHERE wu.rk = 1
@@ -250,7 +252,7 @@ INSERT OVERWRITE TABLE kyy_dwd_exam_type
       on ks.uid = iet11.user_id
 ;
 
-
-
+select * from kaoyaya_adm_orders_user_result ks where  to_char(ks.regdate, 'yyyyMMdd') = '20220208';
+select * from khome_space ks where  to_char(from_unixtime(ks.regdate), 'yyyyMMdd') = '20220208';
 
 

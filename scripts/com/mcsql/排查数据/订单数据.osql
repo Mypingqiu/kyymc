@@ -1,0 +1,41 @@
+--name:订单数据
+--author:xiaoya
+--create time:2022-02-15 10:09
+
+--set
+--odps.idata.system.id = quickbi_query;
+--set
+--odps.sql.submit.mode = script;
+--set
+--odps.task.sql.realtime = all;
+--set
+--odps.sql.type.system.odps2 = true;
+SELECT
+SUM(ALL_T_1_.`pay_amount`) AS T_A0_2_,
+COUNT(ALL_T_1_.`order_id`) AS T_A1_3_
+FROM
+`kyy_test`.`orders_bill` ALL_T_1_
+WHERE
+--ALL_T_1_.`oem` IN ('www')
+ TO_CHAR(ALL_T_1_.`complete_time`, 'yyyyMMdd') >= '20220214'
+AND TO_CHAR(ALL_T_1_.`complete_time`, 'yyyyMMdd') <= '20220214'
+--AND ALL_T_1_.`create_type_str` IN (
+--'充值',
+--'其他',
+--'内部开号-京东',
+--'内部开号-其他',
+--'内部开号-天猫',
+--'内部开号-转账',
+--'开号',
+--'活动领取',
+--'购买'
+--)
+AND ALL_T_1_.`order_status02` IN (
+'仅退款',
+'已支付',
+'退款中（仅退款）',
+'退款中（退款并关闭服务）'
+)
+--LIMIT
+--1000
+;

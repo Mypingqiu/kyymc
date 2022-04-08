@@ -29,6 +29,6 @@ from kyy_dwd_universities_system kdus
   LEFT JOIN khome_space ks
     on kdus.mobile = ks.mobile;
 
-select * from khome_space ks where ks.mobile='15201583278';
+
 
 

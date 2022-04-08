@@ -1,0 +1,93 @@
+--name:注册用户全量信息
+--author:xiaoya
+--create time:2022-02-10 11:07
+
+
+SELECT
+COUNT(DISTINCT AD9_T_1_.`id`) AS T_A0_3_
+FROM
+(
+  SELECT
+  kaour.user_nickname,
+  kaour.username,
+  kaour.name,
+  kaour.mobile,
+  kaour.regdate,
+  kaour.oem,
+  kaour.id,
+  kaour.last_logined_at,
+  kaour.last_visitd_at,
+  kaour.last_paid_at,
+  kaour.last_sub_wechat_id,
+  kaour.buy_amount,
+  kaour.buy_num,
+  kaour.reg_id,
+  kaour.current_exam_type,
+  kaour.exam_type_name,
+  kaour.webcast_flag,
+  kaour.webcast_newdate,
+  kaour.organ01_type01_duration,
+  kaour.organ01_type02_duration,
+  kaour.organ02_type01_duration,
+  kaour.organ02_type02_duration,
+  kaour.organ01_type01_count,
+  kaour.organ01_type02_count,
+  kaour.organ02_type01_count,
+  kaour.organ02_type02_count,
+  kaour.question_flag,
+  kaour.question_time_sum,
+  kaour.question_newdate,
+  kaour.question_count,
+  kaour.true_sum,
+  kaour.error_sum,
+  kaour.video_flag,
+  kaour.video_newdate,
+  kaour.duration_01,
+  kaour.duration_02,
+  kaour.duration_03,
+  kaour.sum_01,
+  kaour.sum_02,
+  kaour.sum_03,
+  kaour.role_type_str,
+  kaour.role_name,
+  kaour.role_id,
+  kaour.business_user_flag,
+  kaour.follow_id,
+  kaour.follow_name,
+  kaour.business_user_time,
+  kaour.subject_5617_flag,
+  kaour.subject_5617_flag_str,
+  kaour.subject_216_flag,
+  kaour.subject_216_flag_str,
+  kaour.business_create_date,
+  kaour.user_address_flag,
+  kaour.province,
+  kaour.city,
+  kaour.address_flag,
+  kaour.TYPE,
+  ob.user_id,
+  ob.pay_amount,
+  ob.complete_time
+  FROM
+  kaoyaya_adm_orders_user_result kaour
+    LEFT JOIN (
+      SELECT
+      a.user_id,
+      a.pay_amount,
+      a.complete_time
+      FROM
+      orders_bill a
+      WHERE
+      a.user_id != 0
+      AND a.create_type IN (1, 2, 5)
+      AND a.pay_amount >= 1
+      AND a.oem = 'www'
+    ) ob ON kaour.id = ob.user_id
+) AD9_T_1_
+  LEFT JOIN `kyy_test`.`kyy_dws_exam_type` AEP_T_2_ ON AD9_T_1_.`id` = AEP_T_2_.`user_id`
+WHERE
+ TO_CHAR(AD9_T_1_.`regdate`, 'yyyyMMdd') >= '20220209'
+AND TO_CHAR(AD9_T_1_.`regdate`, 'yyyyMMdd') <= '20220209'
+AND AEP_T_2_.`industry_exam_name` IN (
+'初级会计职称'
+);

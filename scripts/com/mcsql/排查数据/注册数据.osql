@@ -1,0 +1,39 @@
+--name:注册数据
+--author:xiaoya
+--create time:2022-02-10 11:08
+
+
+SELECT
+AEP_T_2_.`industry_exam_name` AS T_A0_3_,
+COUNT(DISTINCT ATL_T_1_.`id`) AS T_A1_4_
+FROM
+`kyy_test`.`kaoyaya_adm_orders_user_result` ATL_T_1_
+  LEFT JOIN `kyy_test`.`kyy_dws_exam_type` AEP_T_2_ ON ATL_T_1_.`id` = AEP_T_2_.`user_id`
+WHERE
+ TO_CHAR(ATL_T_1_.`regdate`, 'yyyyMMdd') >= '20220209'
+AND TO_CHAR(ATL_T_1_.`regdate`, 'yyyyMMdd') <= '20220209'
+AND AEP_T_2_.`industry_exam_name` IN (
+'初级会计职称'
+)
+GROUP BY
+AEP_T_2_.`industry_exam_name`
+
+;
+
+
+
+select count(distinct kdlu.user_id),count( kdlu.user_id) from kyy_dwd_login_user kdlu;
+select count(distinct kdlu.user_id),count( kdlu.user_id) from  (
+  SELECT   a.user_id
+  ,a.nickname wx_nickname
+  ,max(a.time) wx_time
+  ,sum(CASE WHEN a.wx_state = 1 THEN 1 ELSE 0 END) wx_state_1_sum
+  ,sum(CASE WHEN a.wx_state = 0 THEN 1 ELSE 0 END) wx_state_0_sum
+  FROM    xueyoo_wxuser_info a
+    JOIN    xueyoo_wx_relation b
+      ON      a.token = b.token
+  WHERE   b.TYPE = 1
+  AND     a.user_id != 0
+  GROUP BY a.user_id
+  ,a.nickname
+) kdlu;

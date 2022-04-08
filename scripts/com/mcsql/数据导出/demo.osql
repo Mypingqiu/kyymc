@@ -1,0 +1,71 @@
+--name:demo
+--author:xiaoya
+--create time:2022-02-18 10:14
+
+SELECT distinct ARE_T_1_.`user_id` AS T_A0_4_,
+                AEP_T_2_.`industry_exam_name` AS T_A1_5_,
+                AEP_T_3_.`industry_exam_name` AS T_A2_6_,
+                ARE_T_1_.`role_type_str` AS T_A3_7_,
+                ARE_T_1_.`role_user_flag` AS T_A4_8_,
+                ARE_T_1_.`role_user_id` AS T_A5_9_,
+                ARE_T_1_.`role_user_name` AS T_A6_10_,
+                ARE_T_1_.`appid_name` AS T_A7_11_,
+                ARE_T_1_.`wx_type_sign` AS T_A8_12_,
+                ARE_T_1_.`wx_appid` AS T_A9_13_,
+                ARE_T_1_.`course_exam_type_name` AS T_A01_14_,
+                ARE_T_1_.`course_name` AS T_A11_15_,
+                ARE_T_1_.`flie_exam_type_name` AS T_A21_16_,
+                ARE_T_1_.`flie_name` AS T_A31_17_,
+                ARE_T_1_.`name` AS T_A41_18_,
+                ARE_T_1_.`wx_nickname` AS T_A51_19_,
+                ARE_T_1_.`mobile` AS T_A61_20_,
+                ARE_T_1_.`referer` AS T_A71_21_,
+                ARE_T_1_.`url_path` AS T_A81_22_,
+                ARE_T_1_.`path_name` AS T_A91_23_,
+                ARE_T_1_.`url_path_01` AS T_A02_24_,
+                ARE_T_1_.`path_name_01` AS T_A12_25_,
+                ARE_T_1_.`consult_url_path` AS T_A22_26_,
+                ARE_T_1_.`consult_path_name` AS T_A32_27_,
+                TO_CHAR(ARE_T_1_.`regdate`, 'yyyyMMdd hh:mi:ss') AS T_A42_28_,
+                ARE_T_1_.`oem` AS T_A52_29_,
+                ARE_T_1_.`order_flag` AS T_A62_30_,
+                ARE_T_1_.`wxuser_flag` AS T_A72_31_,
+                ARE_T_1_.`wx_state_flag` AS T_A82_32_,
+                ARE_T_1_.`business_user_flag` AS T_A92_33_,
+                TO_CHAR(ARE_T_1_.`wx_time`, 'yyyyMMdd') AS T_A03_34_,
+                TO_CHAR(ARE_T_1_.`logintime`, 'yyyyMMdd') AS T_A13_35_,
+                ARE_T_1_.`channel_name` AS T_A23_36_,
+                ARE_T_1_.`order_name` AS T_A33_37_,
+                ARE_T_1_.`order_amount` AS T_A43_38_,
+                kdevr.length
+FROM `kyy_test`.`kyy_dwd_login_user` ARE_T_1_
+  LEFT JOIN `kyy_test`.`kyy_dws_exam_type` AEP_T_2_
+    ON ARE_T_1_.`user_id` = AEP_T_2_.`user_id`
+  LEFT JOIN `kyy_test`.`kyy_dws_start_exam_type` AEP_T_3_
+    ON ARE_T_1_.`user_id` = AEP_T_3_.`user_id`
+  LEFT JOIN (
+    select kdevr.user_id,
+           case
+           when sum(kdevr.length) > 0 then sum(kdevr.length) / 60
+           else 0
+           end length
+    from kyy_dws_edu_video_report kdevr
+    where kdevr.dt >= '20211201'
+    group by kdevr.user_id
+  ) kdevr
+    on ARE_T_1_.`user_id` = kdevr.`user_id`
+WHERE TO_CHAR(ARE_T_1_.`regdate`, 'yyyyMMdd') >= '20211201'
+AND TO_CHAR(ARE_T_1_.`regdate`, 'yyyyMMdd') <= '20220217'
+AND ARE_T_1_.`mobile_detection` IN ('正常')
+AND ARE_T_1_.`oem` IN ('www')
+AND ARE_T_1_.`channel_name` LIKE '%赏金猎人%';
+
+
+select kdevr.user_id,
+       sum(kdevr.length)
+from kyy_dws_edu_video_report kdevr
+where kdevr.dt >= '20211201'
+group by kdevr.user_id;
+
+
+

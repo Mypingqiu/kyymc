@@ -1,0 +1,26 @@
+--name:im数据
+--author:xiaoya
+--create time:2022-03-16 15:09
+CREATE TABLE IF NOT EXISTS im_c2c_msg(
+  `id`                            BIGINT COMMENT 'im群组ID',
+  `from_user_id`                  BIGINT COMMENT '会话其中一方的 UserID，若已指定发送消息方帐号，则为消息发送方',
+  `to_user_id`                    BIGINT COMMENT '会话其中一方的 UserID',
+  `msg_seq`                       BIGINT COMMENT '消息序列号，一条消息的唯一标示',
+  `send_msg_result`               BIGINT COMMENT '该条消息的下发结果，0表示下发成功，非0表示下发失败',
+  `type`                          STRING COMMENT '消息类型(0:TIMTextElem,1:TIMLocationElem,2:TIMFaceElem,3:TIMCustomElem,4:TIMSoundElem,5:TIMImageElem,6:TIMFileElem,7:TIMVideoFile...',
+  `content`                       STRING COMMENT '消息内容',
+  `cloud_custom_data`             STRING COMMENT '消息自定义数据，用于消息引用',
+  `created_at`                    DATETIME COMMENT '创建时间',
+  `updated_at`                    DATETIME COMMENT '更新时间',
+  `msg_random`                    BIGINT COMMENT '',
+  `msg_time`                      BIGINT COMMENT '',
+  `send_status`                   BIGINT COMMENT '',
+  `is_read`                       BIGINT COMMENT '消息是否被对方查看过',
+  `is_revoked`                    BIGINT COMMENT '是否被撤回'
+)
+COMMENT '单聊的聊天记录'
+;
+
+
+
+drop TABLE im_group_msg;
